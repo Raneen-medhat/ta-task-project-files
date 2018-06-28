@@ -1,0 +1,111 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <!-- search input -->
+      <input type="text" class="w-100 p-2 m-1 d-block" [(ngModel)]="term" placeholder="بحث">
+    </div>
+    <div class="col-sm-6">
+        <button class="btn btn-outline-primary mb-2 mr-2 p-2 m-1 d-block f-left" (click)="openLg(content)">اضافة صنف</button>
+      </div>
+    <!-- Add new Item Modal-->    
+    <ng-template #content let-c="close" let-d="dismiss">
+        <div class="modal-header">
+          <h4 class="modal-title">اضافة صنف</h4>
+        </div>
+        <div class="modal-body">
+            <!-- Add new Item Form -->
+            <form  name="newItem" #newItem="ngForm" enctype="multipart/form-data" (ngSubmit)="addNewItem(newItem)" novalidate>
+              <label >م</label>
+              <input class="d-block w-100 m-2 p-2" type="number" name="ItemId"  #ItemId="ngModel" [(ngModel)]="newItem.ItemId" readonly>
+              <label >الاسم</label>
+              <input class="d-block w-100 m-2 p-2" type="text" name="ItemName"  #ItemName="ngModel" [(ngModel)]="newItem.ItemName" required>
+              <label >السعر</label>
+              <input class="d-block w-100 m-2 p-2" type="number" name="Price"  #Price="ngModel" [(ngModel)]="newItem.Price" required>
+              <label >صورة</label>
+              <input class="d-block w-100 m-2 p-2" type="file" required (change)="readURL($event.target.files)">
+              <div>
+                  <img *ngFor="let url of urls" [src]="url" class="rounded mb-3" width="180">
+              </div>
+              <input type="hidden">
+              <label >تاريخ الانتهاء</label>
+              <input class="d-block w-100 m-2 p-2" type="date" name="ExpireDate" #ExpireDate="ngModel" [(ngModel)]="newItem.ExpireDate" required>
+              <button class="d-block w-100 m-2 p-2" type="submit" class="btn big-btn mt-2 ml-3"> اضافة</button>
+            </form> 
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" (click)="c('Close click')">الغاء</button>
+        </div>
+    </ng-template>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">م</th>
+          <th scope="col">الاسم</th>
+          <th scope="col">السعر</th>
+          <th scope="col">صورة المنتج</th>
+          <th scope="col">انتهاء الصلاحية</th>
+          <th scope="col">خيارات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of allItems |filter:term">
+          <td>{{item.ItemId}}</td>
+          <td>{{item.ItemName}}</td>
+          <td>{{item.Price}}</td>
+          <td> <img src="{{item.Photo}}" alt="" alt="{{item.ItemName}}">
+            </td>
+          <td>{{item.ExpireDate | date: 'dd/MM/yyyy'}}</td>
+          <td>  <button class="btn btn-outline-danger m-1" (click)="openVerticallyCentered(content3)">مسح</button> 
+            <!-- To delete item with confirmation msg-->
+            <ng-template #content3 let-c="close" let-d="dismiss">
+                <div class="modal-header">
+                  <h4 class="modal-title">تاكيد الحذف</h4>
+                </div>
+                <div class="modal-body text-right">
+                  <p>هل انت متاكد من حذف هذا الصنف&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-danger m-1" (click)="deleteItem(item.ItemId)">تاكيد</button>
+                  <button type="button" class="btn btn-outline-success m-1" (click)="c('Close click')">الغاء</button>
+                </div>
+            </ng-template>
+            <!-- To Update item with confirmation msg-->
+              <button class="btn btn-outline-primary m-1" (click)="updateItem(content2,item.ItemId,item.ExpireDate)">تعديل</button>
+               <ng-template #content2 let-c="close" let-d="dismiss">
+                  <div class="modal-header">
+                    <h4 class="modal-title">تعديل الصنف</h4>
+                  </div>
+                  <div class="modal-body">
+                  <!-- Add new Item Form -->
+                  <form  name="updateItem" #updateItem="ngForm" enctype="multipart/form-data" (ngSubmit)="toUpdateItem(updateItem)" novalidate>
+                    <label >م</label>
+                    <input class="d-block w-100 m-2 p-2" type="number" name="ItemId"  #ItemId="ngModel" [(ngModel)]="targetItem.ItemId" value="{{targetItem.ItemId}}" readonly>
+                    <label >الاسم</label>
+                    <input class="d-block w-100 m-2 p-2" type="text" name="ItemName"  #ItemName="ngModel" [(ngModel)]="targetItem.ItemName" value="{{targetItem.ItemName}}" required>
+                    <label >السعر</label>
+                    <input class="d-block w-100 m-2 p-2" type="number" name="Price"  #Price="ngModel" [(ngModel)]="targetItem.Price" value="{{targetItem.Price}}"required>
+                    <label >صورة</label>
+                    <input class="d-block w-100 m-2 p-2" type="file" required (change)="readURL($event.target.files)">
+                    <div>
+                        <img *ngFor="let url of urls" [src]="url" class="rounded mb-3" width="180">
+                    </div>
+                    <input type="hidden">
+                    <label >تاريخ الانتهاء</label>
+                    <input class="d-block w-100 m-2 p-2" type="date" name="ExpireDate" #ExpireDate="ngModel" id="date"[(ngModel)]="targetItem.ExpireDate" value="{{targetItem.ExpireDate | date: 'dd/MM/yyyy' }}" required>
+                    <div class="modal-footer text-right">
+                        <button class="d-block w-100 m-2 p-2" type="submit" class="btn big-btn mt-2 ml-3 btn btn-outline-success"> حفظ</button>
+                        <button type="button" class="btn btn-outline-danger" (click)="c('Close click')">الغاء</button>
+                      </div>
+                  </form> 
+                </div>
+                
+              </ng-template>
+          </td>
+  
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
